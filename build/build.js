@@ -5,17 +5,17 @@ process.env.NODE_ENV = 'production'
 var ora = require('ora')
 var rm = require('rimraf')
 var path = require('path')
-var chalk = require('chalk')
+var chalk = require('chalk')// for font color
 var webpack = require('webpack')
-var config = require('../config')
+var config = require('../config')//default to read config/index.html
 var webpackConfig = require('./webpack.prod.conf')
 
-var spinner = ora('building for production...')
+var spinner = ora('building for production...')//output log
 spinner.start()
 
-rm(path.join(config.build.assetsRoot, config.build.assetsSubDirectory), err => {
+rm(path.join(config.build.assetsRoot, config.build.assetsSubDirectory), err => {//remove the previous dir
   if (err) throw err
-  webpack(webpackConfig, function (err, stats) {
+  webpack(webpackConfig, function (err, stats) {//use webpack to pack projects
     spinner.stop()
     if (err) throw err
     process.stdout.write(stats.toString({

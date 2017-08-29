@@ -2,7 +2,7 @@ var path = require('path')
 var utils = require('./utils')
 var webpack = require('webpack')
 var config = require('../config')
-var merge = require('webpack-merge')
+var merge = require('webpack-merge')//tool is used to extend webpack.base.conf.js
 var baseWebpackConfig = require('./webpack.base.conf')
 var CopyWebpackPlugin = require('copy-webpack-plugin')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
@@ -18,7 +18,7 @@ var webpackConfig = merge(baseWebpackConfig, {
       extract: true
     })
   },
-  devtool: config.build.productionSourceMap ? '#source-map' : false,
+  devtool: config.build.productionSourceMap ? '#source-map' : false,//debug source map
   output: {
     path: config.build.assetsRoot,
     filename: utils.assetsPath('js/[name].[chunkhash].js'),
@@ -37,7 +37,7 @@ var webpackConfig = merge(baseWebpackConfig, {
     }),
     // extract css into its own file
     new ExtractTextPlugin({
-      filename: utils.assetsPath('css/[name].[contenthash].css')
+      filename: utils.assetsPath('css/[name].[contenthash].css')// extract css and make to style and insert in html
     }),
     // Compress extracted CSS. We are using this plugin so that possible
     // duplicated CSS from different components can be deduped.
@@ -54,14 +54,14 @@ var webpackConfig = merge(baseWebpackConfig, {
       template: 'index.html',
       inject: true,
       minify: {
-        removeComments: true,
-        collapseWhitespace: true,
-        removeAttributeQuotes: true
+        removeComments: true,//remove comments
+        collapseWhitespace: true,//remove space
+        removeAttributeQuotes: true//remove quote marks in html
         // more options:
         // https://github.com/kangax/html-minifier#options-quick-reference
       },
       // necessary to consistently work with multiple chunks via CommonsChunkPlugin
-      chunksSortMode: 'dependency'
+      chunksSortMode: 'dependency'//sort the dependency module 
     }),
     // split vendor js into its own file
     new webpack.optimize.CommonsChunkPlugin({
