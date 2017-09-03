@@ -1,0 +1,24 @@
+{
+  "status":"0",
+  "msg":"",
+  "result":[
+    {
+      "productid":"100001",
+      "productName":"yinxiang",
+      "productPrice":199,
+      "productImg":"1.jpg"
+    },
+    {
+      "productid":"100001",
+      "productName":"XXX",
+      "productPrice":2499,
+      "productImg":"2.jpg"
+    },
+    {
+      "productid":"100001",
+      "productName":"YYY",
+      "productPrice":299,
+      "productImg":"3.jpg"
+    }
+  ]
+}

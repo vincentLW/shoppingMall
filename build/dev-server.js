@@ -21,6 +21,14 @@ var autoOpenBrowser = !!config.dev.autoOpenBrowser
 var proxyTable = config.dev.proxyTable
 
 var app = express()
+//get mock data
+/*var router=express.Router();
+var goodsDate=require('./../mock/goods.json');
+
+router.get("/goods",function (req,res,next) {
+  res.json(goodsDate);
+});
+app.use(router);*/
 var compiler = webpack(webpackConfig)
 
 var devMiddleware = require('webpack-dev-middleware')(compiler, {
