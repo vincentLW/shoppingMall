@@ -1,3 +1,4 @@
+'use strict'
 var express=require('express');
 var router= express.Router();
 var mongoose= require('mongoose');
@@ -19,7 +20,18 @@ mongoose.connection.on('disconnected',function () {
 });
 
 router.get('/',function (req,res,next) {
-  Goods.find({},function (err,doc) {
+  //get params of request
+  let page=parseInt(req.param('page'));
+  let pageSize=parseInt(req.param('pageSize'));
+  let sort=req.param('sort');
+  //paging function
+  let skip=(page-1)*pageSize;
+  let params={};
+  //find return a model and skip and get limited item
+  let goodsModel=Goods.find(params).skip(skip).limit(pageSize);
+  goodsModel.sort({'salePrice':sort});
+  //after sort then exec the query
+  goodsModel.exec(function (err,doc) {
     if(err){
       res.json({
         status:'1',
