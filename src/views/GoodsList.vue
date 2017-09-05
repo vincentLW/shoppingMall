@@ -29,7 +29,7 @@
             <div class="accessory-list-wrap">
               <div class="accessory-list col-4">
                 <ul>
-                  <li v-for="(item,index) in goodsList.list">
+                  <li v-for="(item,index) in goodsList">
                     <div class="pic">
                       <a href="#"><img v-lazy="'static/'+item.productImage" alt=""></a>
                     </div>
@@ -42,6 +42,9 @@
                     </div>
                   </li>
                 </ul>
+                <div v-infinite-scroll="loadMore" class="load-more" infinite-scroll-disabled="busy" infinite-scroll-distance="30">
+                  <img src="./../assets/loading-spinning-bubbles.svg" v-show="loading">
+                </div>
               </div>
             </div>
           </div>
@@ -51,6 +54,13 @@
       <nav-footer></nav-footer>
     </div>
 </template>
+<style>
+  .load-more{
+    height:100px;
+    line-height: 100px;
+    text-align: center;
+  }
+</style>
 <script>
     import './../assets/css/base.css'
     import './../assets/css/login.css'
@@ -82,7 +92,9 @@
               overLayFlag:false,
               sortFlag:true,
               page:1,
-              pageSize:8
+              pageSize:8,
+              busy:true,
+              loading:false
             }
         },
         components: {
@@ -95,20 +107,34 @@
           this.getGoodsList();
         },
         methods:{
-          getGoodsList(){
+          getGoodsList(flag){
             var param={
               page:this.page,
               pageSize:this.pageSize,
-              sort:this.sortFlag?1:-1
+              sort:this.sortFlag?1:-1,
+              priceLevel:this.priceChecked
             };
+            //before get data show loading
+            this.loading=true;
             //get dat from mock
             axios.get('/goods',{
               params:param
             }).then((result)=>{
+                this.loading=false;
                 let response=result.data;
-
                 if(response.status=='0'){
-                  this.goodsList=response.result;
+                  //if flag is true mean it will load more data
+                  if(flag){
+                      this.goodsList=this.goodsList.concat(response.result.list);
+                  }else{
+                      this.goodsList=response.result.list;
+                  }
+                  //if flag is true mean it will load more data
+                  if(response.result.count<8){
+                    this.busy=true;
+                  }else {
+                    this.busy=false;
+                  }
                 }else{
                   this.goodsList=[];
                 }
@@ -126,6 +152,8 @@
           },
           setPriceFilter(index){
             this.priceChecked=index;
+            this.getGoodsList(false);
+            this.page=1;
             this.closePop();
           },
           sortGoods(){
@@ -133,6 +161,14 @@
             this.page=1;
             this.pageSize=8;
             this.getGoodsList();
+          },
+          loadMore(){
+            this.busy=true;
+            setTimeout(() => {
+              this.page++;
+              this.getGoodsList(true);
+              this.busy = false;
+            }, 500);
           }
         }
     }
