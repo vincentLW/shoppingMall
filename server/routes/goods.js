@@ -3,6 +3,7 @@ var express=require('express');
 var router= express.Router();
 var mongoose= require('mongoose');
 var Goods=require('../models/goods');
+var User=require('../models/user');
 
 //connect mongodb db
 mongoose.connect('mongodb://127.0.0.1:27017/shoppingmall');
@@ -67,5 +68,84 @@ router.get('/',function (req,res,next) {
 
   });
 });
+//add to cart
+router.post('/addCart',function (req,res,next) {
+  var userId='100000077',productId=req.body.productId;
+  User.findOne({userId:userId},function (err,docUser) {
+    if(err){
+      res.json({
+        status:'1',
+        msg:err.message,
+        result:''
+      });
+    }else{
+      if(docUser){
+        let goodsItem='';
+        docUser.cartList.forEach(function (item) {
+          if(item.productId==productId){
+            goodsItem=item;
+            item.productNum++
+          }
+        });
+        //to see if there is already got this item
+        if(goodsItem){
+          docUser.save(function (err2,doc) {
+            if(err2){
+              res.json({
+                status: '1',
+                msg: err2.message,
+                result: ''
+              });
+            }else{
+              res.json({
+                status: '0',
+                msg: '',
+                result: 'suc'
+              });
+            }
+
+          });
+        }else{
+          Goods.findOne({productId:productId},function (err,doc) {
+            if(err) {
+              res.json({
+                status: '1',
+                msg: err.message,
+                result: ''
+              });
+            }else{
+              if(doc){
+                doc._doc.productNum=1;
+                doc._doc.checked=1;
+                console.log(doc.productName);
+                console.log('document');
+                console.log(doc);
+                docUser.cartList.push(doc);
+                docUser.save(function (err2,doc) {
+                  if(err2){
+                    res.json({
+                      status: '1',
+                      msg: err2.message,
+                      result: ''
+                    });
+                  }else{
+                    res.json({
+                      status: '0',
+                      msg: '',
+                      result: 'suc'
+                    });
+                  }
+
+                });
+              }
+            }
+          });
+        }
+
+      }
+    }
+
+  });
+})
 
 module.exports=router;

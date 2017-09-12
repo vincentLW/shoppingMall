@@ -10,7 +10,12 @@
           <div class="filter-nav">
             <span class="sortby">Sort by:</span>
             <a href="javascript:void(0)" class="default cur">Default</a>
-            <a href="javascript:void(0)" class="price" @click="sortGoods">Price <svg class="icon icon-arrow-short"><use xlink:href="#icon-arrow-short"></use></svg></a>
+            <a href="javascript:void(0)" class="price" @click="sortGoods">Price
+              <svg class="icon icon-arrow-short" v-bind:class="{'sort-up':!sortFlag}">
+                <!--<use xmlns: xlink:="http://www.w3.org/1999/xlink" xlink:href="#icon-arrow-short"></use>-->
+                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-arrow-short"></use>
+              </svg>
+            </a>
             <a href="javascript:void(0)" class="filterby stopPop" @click="showFilterPop">Filter by</a>
           </div>
           <div class="accessory-result">
@@ -18,7 +23,7 @@
             <div class="filter stopPop" id="filter" v-bind:class="{'filterby-show':filterBy}">
               <dl class="filter-price">
                 <dt>Price:</dt>
-                <dd><a href="javascript:void(0)" v-bind:class="{'cur':priceChecked=='all'}" @click="priceChecked=all">All</a></dd>
+                <dd><a href="javascript:void(0)" v-bind:class="{'cur':priceChecked=='all'}" @click="setPriceFilter('all')">All</a></dd>
                 <dd v-for="(price,index) in priceFilter" >
                   <a href="javascript:void(0)" v-bind:class="{'cur':priceChecked==index}" @click="setPriceFilter(index)">{{price.startPrice}} - {{price.endPrice}}</a>
                 </dd>
@@ -37,7 +42,7 @@
                       <div class="name">{{item.productName}}</div>
                       <div class="price">{{item.salePrice}}</div>
                       <div class="btn-area">
-                        <a href="javascript:;" class="btn btn--m">加入购物车</a>
+                        <a href="javascript:;" class="btn btn--m" @click="addCart(item.productId)">加入购物车</a>
                       </div>
                     </div>
                   </li>
@@ -50,7 +55,29 @@
           </div>
         </div>
       </div>
-      <div class="md-overlay" v-show="overLayFlag" @click="closePop"></div>
+      <div class="md-overlay" v-show="overLayFlag" @click="closePop" ></div>
+      <modal v-bind:mdShow="mdShow" v-on:close="closeModal">
+        <p slot="message">
+          Please Log In first to add item to the cart
+        </p>
+        <div slot="btnGroup">
+          <a class="btn btn--m" @click="mdShow=false">Close</a>
+        </div>
+      </modal>
+
+      <modal v-bind:mdShow="mdShowCart" v-on:close="closeModal">
+        <p slot="message">
+          <svg class="icon-status-ok">
+            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-status-ok"></use>
+          </svg>
+          <span>Add item to cart successfully</span>
+        </p>
+        <div slot="btnGroup">
+          <a class="btn btn--m" @click="mdShowCart=false">Close</a>
+          <router-link class="btn btn--m" href="javascript:;" to="/cart">Check Cart</router-link>
+
+        </div>
+      </modal>
       <nav-footer></nav-footer>
     </div>
 </template>
@@ -60,6 +87,14 @@
     line-height: 100px;
     text-align: center;
   }
+  .sort-out{
+    transform: rotate(180deg);
+    transition: all .3s ease-out;
+  }
+  .btn:hover{
+    background-color: #ffe5e6;
+    transition: all .3s ease-out;
+  }
 </style>
 <script>
     import './../assets/css/base.css'
@@ -68,6 +103,7 @@
     import NavHeader from '@/components/NavHeader.vue'
     import NavFooter from '@/components/NavFooter.vue'
     import NavBread from '@/components/NavBread.vue'
+    import Modal from '@/components/Modal.vue'
     import axios from 'axios'
     export default{
         data(){
@@ -88,6 +124,8 @@
                   }
                 ],
               priceChecked:'all',
+              mdShow:false,
+              mdShowCart:false,
               filterBy:false,
               overLayFlag:false,
               sortFlag:true,
@@ -100,7 +138,8 @@
         components: {
             NavHeader,
             NavFooter,
-            NavBread
+            NavBread,
+            Modal
         },
       //initial method for lifetime
         mounted:function () {
@@ -152,8 +191,8 @@
           },
           setPriceFilter(index){
             this.priceChecked=index;
-            this.getGoodsList(false);
             this.page=1;
+            this.getGoodsList(false);
             this.closePop();
           },
           sortGoods(){
@@ -169,7 +208,22 @@
               this.getGoodsList(true);
               this.busy = false;
             }, 500);
+          },
+          addCart(productId){
+            axios.post('/goods/addCart',{productId:productId}).then((res)=> {
+              console.log(res);
+              if(res.data.status=='0'){
+                this.mdShowCart=true;
+              }else{
+                this.mdShow=true;
+              }
+            });
+          },
+          closeModal(){
+            this.mdShow=false;
+            this.mdShowCart=false;
           }
+
         }
     }
 </script>

@@ -31,6 +31,9 @@ module.exports = {
       //set the target in order to get access to bypass the cross-domain policies
       '/goods':{
         target:'http://127.0.0.1:3000'
+      },
+      '/users':{
+        target:'http://127.0.0.1:3000'
       }
     },
     // CSS Sourcemaps off by default because relative paths are "buggy"
